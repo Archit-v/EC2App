@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:5.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-db:/data/db
+    networks:
+      - app-network
+
+  boot: 
+    image: mishra23/architcont1:chatbackend
+    build: 
+      context: mishra23/architcont1:chatbackend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"  
+    environment: 
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/chatapp
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  react:
+    image: mishra23/architcont1:front-chat
+    build:
+      context: mishra23/architcont1:front-chat
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+     - boot
+
+volumes:
+  mongo-db:
+
+networks:
+  app-network:
